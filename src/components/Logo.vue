@@ -1,3 +1,3 @@
 <template>
-  <material-symbols-add-reaction />
+  <material-symbols-add-reaction-outline-rounded />
 </template>
