@@ -1,10 +1,10 @@
 {
-  "name": "vitesse-webext",
-  "displayName": "Vitesse WebExt",
+  "name": "meet-emoji-reaction-by-key",
+  "displayName": "Emoji Reaction By Key on meet",
   "version": "0.0.1",
   "private": true,
   "packageManager": "pnpm@8.3.1",
-  "description": "[description]",
+  "description": "google meetで会話中に1-9のキーをタイプすることで対応するリアクションをすることができる",
   "scripts": {
     "dev": "npm run clear && cross-env NODE_ENV=development run-p dev:*",
     "dev-firefox": "npm run clear && cross-env NODE_ENV=development EXTENSION=firefox run-p dev:*",

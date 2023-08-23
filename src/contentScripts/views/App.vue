@@ -2,7 +2,7 @@
 import { useToggle } from '@vueuse/core'
 import 'uno.css'
 
-const [show, toggle] = useToggle(false)
+const [show] = useToggle(false)
 </script>
 
 <template>
@@ -15,16 +15,8 @@ const [show, toggle] = useToggle(false)
       :class="show ? 'opacity-100' : 'opacity-0'"
     >
       <h1 class="text-lg">
-        Vitesse WebExt
+        ほげ
       </h1>
-      <SharedSubtitle />
     </div>
-    <button
-      class="flex w-10 h-10 rounded-full shadow cursor-pointer border-none"
-      bg="teal-600 hover:teal-700"
-      @click="toggle()"
-    >
-      <pixelarticons-power class="block m-auto text-white text-lg" />
-    </button>
   </div>
 </template>
