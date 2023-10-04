@@ -17,10 +17,6 @@ export async function getManifest() {
       default_icon: './assets/icon.png',
       default_popup: './dist/popup/index.html',
     },
-    // options_ui: {
-    //   page: './dist/options/index.html',
-    //   open_in_tab: true,
-    // },
     background: isFirefox
       ? {
           scripts: ['dist/background/index.mjs'],
@@ -34,9 +30,6 @@ export async function getManifest() {
       48: './assets/icon.png',
       128: './assets/icon.png',
     },
-    permissions: [
-      'activeTab',
-    ],
     host_permissions: [
       '*://meet.google.com/*',
     ],
@@ -50,13 +43,6 @@ export async function getManifest() {
         ],
       },
     ],
-
-    // web_accessible_resources: [
-    //   {
-    //     resources: ['dist/contentScripts/style.css'],
-    //     matches: ['<all_urls>'],
-    //   },
-    // ],
     content_security_policy: {
       extension_pages: isDev
         // this is required on dev for Vite script to load
