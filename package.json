@@ -1,7 +1,7 @@
 {
   "name": "meet-emoji-reaction-by-key",
   "displayName": "Emoji Reaction By Key on meet",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "packageManager": "pnpm@8.3.1",
   "description": "You can type the keys 1-9 during a conversation in google meet to get the corresponding reaction.",

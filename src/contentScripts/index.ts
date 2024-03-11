@@ -1,5 +1,5 @@
 (() => {
-  const REACTION_LABELS = ['リアクション', 'Reactions']
+  const REACTION_LABELS = ['リアクション', 'Reactions', 'リアクションを送信', 'Send a reaction']
 
   function addNumberToEmoji() {
     const emojiContainer = document.querySelector(
