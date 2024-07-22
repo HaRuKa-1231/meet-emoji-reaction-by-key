@@ -77,6 +77,10 @@
   document.addEventListener('keydown', (event) => {
     // Check if the user is typing in an input or textarea element
     const activeElementTag = document.activeElement?.tagName
+
+    if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
+      return
+
     if (activeElementTag === 'INPUT' || activeElementTag === 'TEXTAREA')
       return // Do nothing if the user is typing in an input or textarea
 
