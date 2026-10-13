@@ -73,6 +73,29 @@ describe('register menu', () => {
     expect(menuElement()!.textContent).toContain('🐱')
   })
 
+  it('バーの絵文字のときは、バーにかぶらないようにバーの上に出す', () => {
+    document.querySelector<HTMLElement>('div[aria-label="リアクションを送信"]')!.getBoundingClientRect = () => ({ top: 700, bottom: 760, left: 50, right: 500 }) as DOMRect
+    rightClick(document.querySelector('#recent')!)
+
+    expect(menuElement()!.style.top).toBe('532px')
+    expect(menuElement()!.style.left).toBe('100px')
+  })
+
+  it('一覧の絵文字で上に出す場所がないときは、一覧にかぶらないように一覧の左に出す', () => {
+    document.querySelector<HTMLElement>('#emoji-picker')!.getBoundingClientRect = () => ({ top: 100, bottom: 500, left: 500, right: 800 }) as DOMRect
+    rightClick(document.querySelector('#picker-item')!)
+
+    expect(menuElement()!.style.left).toBe('292px')
+    expect(menuElement()!.style.top).toBe('120px')
+  })
+
+  it('一覧の左にも場所がないときは、一覧の右に出す', () => {
+    document.querySelector<HTMLElement>('#emoji-picker')!.getBoundingClientRect = () => ({ top: 100, bottom: 500, left: 100, right: 400 }) as DOMRect
+    rightClick(document.querySelector('#picker-item')!)
+
+    expect(menuElement()!.style.left).toBe('408px')
+  })
+
   it('絵文字以外を右クリックしたときは何もしない', () => {
     const event = rightClick(document.querySelector('#video')!)
 

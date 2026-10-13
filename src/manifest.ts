@@ -17,8 +17,8 @@ export async function getManifest() {
     description: '__MSG_extDescription__',
     default_locale: 'en',
     action: {
-      default_icon: './assets/icon.png',
-      default_popup: './dist/popup/index.html',
+      default_icon: 'assets/icon.png',
+      default_popup: 'dist/popup/index.html',
     },
     background: isFirefox
       ? {
@@ -26,12 +26,12 @@ export async function getManifest() {
           type: 'module',
         }
       : {
-          service_worker: './dist/background/index.mjs',
+          service_worker: 'dist/background/index.mjs',
         },
     icons: {
-      16: './assets/icon.png',
-      48: './assets/icon.png',
-      128: './assets/icon.png',
+      16: 'assets/icon.png',
+      48: 'assets/icon.png',
+      128: 'assets/icon.png',
     },
     permissions: ['storage'],
     host_permissions: [

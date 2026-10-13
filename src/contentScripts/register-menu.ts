@@ -2,6 +2,8 @@ import type { Shortcuts } from '~/logic/favorites'
 import { SHORTCUT_KEYS } from '~/logic/favorites'
 import { t } from '~/logic/i18n'
 
+const MENU_GAP = 8
+
 interface RegisterMenuOptions {
   getShortcuts: () => Shortcuts
   onAssign: (key: number, emoji: string) => void
@@ -50,7 +52,17 @@ export function createRegisterMenu({ getShortcuts, onAssign }: RegisterMenuOptio
     onAssign(key, emoji)
   }
 
-  function open(emoji: string, x: number, y: number) {
+  function placeAwayFrom(anchor: Element | null, x: number, y: number, width: number, height: number) {
+    const rect = anchor?.getBoundingClientRect()
+    if (!rect)
+      return { left: x, top: y - height }
+    if (rect.top - height - MENU_GAP >= MENU_GAP)
+      return { left: x, top: rect.top - height - MENU_GAP }
+    const leftSide = rect.left - width - MENU_GAP
+    return { left: leftSide >= MENU_GAP ? leftSide : rect.right + MENU_GAP, top: y - height / 2 }
+  }
+
+  function open(emoji: string, x: number, y: number, anchor: Element | null) {
     close()
     const shortcuts = getShortcuts()
 
@@ -95,8 +107,9 @@ export function createRegisterMenu({ getShortcuts, onAssign }: RegisterMenuOptio
     document.body.append(menu)
     const width = menu.offsetWidth || 200
     const height = menu.offsetHeight || 160
-    menu.style.left = `${Math.max(8, Math.min(x, window.innerWidth - width - 8))}px`
-    menu.style.top = `${Math.max(8, Math.min(y - height, window.innerHeight - height - 8))}px`
+    const { left, top } = placeAwayFrom(anchor, x, y, width, height)
+    menu.style.left = `${Math.max(MENU_GAP, Math.min(left, window.innerWidth - width - MENU_GAP))}px`
+    menu.style.top = `${Math.max(MENU_GAP, Math.min(top, window.innerHeight - height - MENU_GAP))}px`
     menu.querySelector<HTMLButtonElement>('button')?.focus()
     document.addEventListener('pointerdown', handleOutsidePointerdown, true)
   }
@@ -107,7 +120,7 @@ export function createRegisterMenu({ getShortcuts, onAssign }: RegisterMenuOptio
     if (!emoji)
       return
     event.preventDefault()
-    open(emoji, event.clientX, event.clientY)
+    open(emoji, event.clientX, event.clientY, target!.closest('[role="dialog"]'))
   }
 
   return { handleContextmenu, close }
