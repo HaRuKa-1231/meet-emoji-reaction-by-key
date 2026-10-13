@@ -17,6 +17,17 @@ Emoji Reaction By Key on meet is a browser extension that allows you to easily a
 
 During a meeting, type the number keys (1-9) on your keyboard. As you type the keys, emoji reactions corresponding to them will appear on the Meet emoji bar and will be instantly conveyed to other participants in real-time.
 
+Press `0` to open the emoji picker. The search box is focused automatically, so type a keyword (in your Meet display language) and press `Enter` to send the first matching emoji. The picker closes after sending.
+
+### Favorites
+
+- Press `Shift` + `1`-`9` to send your favorite emojis, even ones not on the emoji bar.
+- Hold `Shift` to see your favorites above the emoji bar. Click the `⇧` button next to the bar to keep them shown.
+- Right-click any emoji on the bar or in the picker to add it to a favorite slot. You can undo the change from the notice that appears.
+- Open the extension popup to reorder, clear, or reset your favorites.
+
+Keys are ignored while you are typing (chat, Gemini, search boxes) or after you click inside the side panel. Click outside the side panel to use them again.
+
 **Note**: When you install this extension, emoji reactions corresponding to the numbers you type will be displayed on the Meet emoji bar. However, if other extensions have assigned different actions to number keys, Meet Emoji Reactions may not function correctly. In such cases, you may need to adjust the settings of other extensions.
 
 ## Development
@@ -59,4 +70,6 @@ To build the extension, run:
 pnpm build
 ```
 
-Then, pack the files under `extension`. You can upload `extension.crx` or `extension.xpi` to the appropriate extension store.
+To try a production build locally, run `pnpm build:local` instead. It adds the build time to the extension name (e.g. `Emoji Reaction By Key on meet (local 10-13 16:21)`) so you can tell which build is loaded. Don't pack this build.
+
+Then, run `pnpm run pack` (it runs the store build first and packs the files under `extension`). You can upload `extension.crx` or `extension.xpi` to the appropriate extension store.

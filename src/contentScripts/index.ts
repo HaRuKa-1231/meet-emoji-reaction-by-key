@@ -1,52 +1,50 @@
+import { addNumberToEmoji, handleKeydown, handlePointerdown, sendFavorite } from './reaction'
+import { createFavoritesRow } from './favorites-row'
+import { createRegisterMenu } from './register-menu'
+import { showToast } from './toast'
+import { createGuide } from './guide'
+import { DEFAULT_SHORTCUTS, assignFavorite, loadPinned, loadShortcuts, savePinned, saveShortcuts, watchShortcuts } from '~/logic/shortcuts'
+import { loadGuideSeen, saveGuideSeen } from '~/logic/whats-new'
+
 (() => {
-  const REACTION_LABELS = ['リアクション', 'Reactions', 'リアクションを送信', 'Send a reaction']
+  let shortcuts = DEFAULT_SHORTCUTS
 
-  function addNumberToEmoji() {
-    const emojiContainer = document.querySelector(
-      REACTION_LABELS.map(label => `div[aria-label="${label}"]`).join(', '),
-    )
-    const emojiButtons = emojiContainer?.querySelectorAll('button')
+  const favoritesRow = createFavoritesRow({
+    getShortcuts: () => shortcuts,
+    onSend: emoji => sendFavorite(emoji),
+    onPinChange: pinned => savePinned(pinned),
+  })
 
-    if (emojiButtons) {
-      emojiButtons.forEach((button, index) => {
-        // Check if the number is already added
-        const existingNumber = button.querySelector('.emoji-number-label')
-        if (existingNumber)
-          existingNumber.remove()
-
-        // Create a new number element
-        const numberElement = document.createElement('span')
-        numberElement.textContent = `${index + 1}`
-        numberElement.classList.add('emoji-number-label')
-
-        // Apply styles
-        const buttonSize = button.getBoundingClientRect()
-        const numberSize = buttonSize.width / 3
-
-        const COMMON_STYLE = {
-          position: 'absolute',
-          bottom: '0',
-          right: '0',
-          width: `${numberSize}px`,
-          height: `${numberSize}px`,
-          backgroundColor: 'white',
-          color: 'black',
-          borderRadius: '50%',
-          textAlign: 'center',
-          lineHeight: `${numberSize}px`,
-          fontSize: `${numberSize * 0.6}px`, // Adjust font size based on number size
-        }
-
-        Object.assign(numberElement.style, COMMON_STYLE)
-
-        // Append the number to the button
-        button.style.position = 'relative'
-        button.appendChild(numberElement)
+  const registerMenu = createRegisterMenu({
+    getShortcuts: () => shortcuts,
+    onAssign: (key, emoji) => {
+      const previous = shortcuts
+      shortcuts = assignFavorite(previous, key, emoji)
+      favoritesRow.update()
+      saveShortcuts(shortcuts)
+      showToast(`⇧${key}: ${previous[key] || '—'} → ${emoji}`, () => {
+        shortcuts = previous
+        favoritesRow.update()
+        saveShortcuts(previous)
       })
-    }
-  }
+    },
+  })
 
-  // Rest of the code remains the same
+  loadShortcuts().then((loaded) => {
+    shortcuts = loaded
+    favoritesRow.update()
+  })
+  watchShortcuts((changed) => {
+    shortcuts = changed
+    favoritesRow.update()
+  })
+  loadPinned().then(pinned => favoritesRow.setPinned(pinned))
+
+  const guide = createGuide({ onDismiss: () => saveGuideSeen() })
+  loadGuideSeen().then((seen) => {
+    if (!seen)
+      guide.show()
+  })
 
   // 監視の対象となるノードを選択
   const targetNode = document.body
@@ -57,42 +55,33 @@
     subtree: true,
   }
 
+  const update = (observer: MutationObserver) => {
+    observer.disconnect() // 監視を一時停止
+    addNumberToEmoji()
+    favoritesRow.update()
+    guide.update()
+    observer.observe(targetNode, config) // 監視を再開
+  }
+
   // コールバック関数
   const callback: MutationCallback = function (mutationsList, observer) {
-    for (const mutation of mutationsList) {
-      if (mutation.type === 'childList') {
-        observer.disconnect() // 監視を一時停止
-        addNumberToEmoji()
-        observer.observe(targetNode, config) // 監視を再開
-      }
-    }
+    if (mutationsList.some(mutation => mutation.type === 'childList'))
+      update(observer)
   }
 
   // MutationObserverをインスタンス化
   const observer = new MutationObserver(callback)
 
   // 監視を開始
-  observer.observe(targetNode, config)
+  update(observer)
 
-  document.addEventListener('keydown', (event) => {
-    // Check if the user is typing in an input or textarea element
-    const activeElementTag = document.activeElement?.tagName
-
-    if (event.metaKey || event.altKey || event.ctrlKey || event.shiftKey)
-      return
-
-    if (activeElementTag === 'INPUT' || activeElementTag === 'TEXTAREA')
-      return // Do nothing if the user is typing in an input or textarea
-
-    if (event.key >= '1' && event.key <= '9') {
-      // Use the REACTION_LABELS constant to find the emoji container
-      const emojiContainer = document.querySelector(
-        REACTION_LABELS.map(label => `div[aria-label="${label}"]`).join(', '),
-      )
-      const emojiButtons = emojiContainer?.querySelectorAll('button')
-      const targetButton = emojiButtons?.[parseInt(event.key) - 1]
-      if (targetButton)
-        targetButton.click()
-    }
+  document.addEventListener('pointerdown', handlePointerdown, true)
+  document.addEventListener('keydown', event => handleKeydown(event, document, shortcuts))
+  document.addEventListener('keydown', favoritesRow.handleKeydown)
+  document.addEventListener('keyup', favoritesRow.handleKeyup)
+  document.addEventListener('contextmenu', registerMenu.handleContextmenu)
+  window.addEventListener('resize', () => {
+    favoritesRow.update()
+    guide.update()
   })
 })()
