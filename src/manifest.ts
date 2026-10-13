@@ -1,18 +1,21 @@
 import fs from 'fs-extra'
 import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
-import { isDev, isFirefox, port, r } from '../scripts/utils'
+import { isDev, isFirefox, isLocalBuild, port, r } from '../scripts/utils'
 
 export async function getManifest() {
   const pkg = await fs.readJSON(r('package.json')) as typeof PkgType
+  const name = pkg.displayName || pkg.name
+  const builtAt = new Date().toLocaleString('sv-SE').slice(5, 16)
 
   // update this file to update this manifest.json
   // can also be conditional based on your need
   const manifest: Manifest.WebExtensionManifest = {
     manifest_version: 3,
-    name: pkg.displayName || pkg.name,
+    name: isLocalBuild ? `${name} (local ${builtAt})` : name,
     version: pkg.version,
-    description: pkg.description,
+    description: '__MSG_extDescription__',
+    default_locale: 'en',
     action: {
       default_icon: './assets/icon.png',
       default_popup: './dist/popup/index.html',
@@ -30,6 +33,7 @@ export async function getManifest() {
       48: './assets/icon.png',
       128: './assets/icon.png',
     },
+    permissions: ['storage'],
     host_permissions: [
       '*://meet.google.com/*',
     ],
